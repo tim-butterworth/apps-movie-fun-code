@@ -17,11 +17,11 @@
 package org.superbiz.moviefun;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.superbiz.moviefun.movies.Movie;
 import org.superbiz.moviefun.movies.MoviesBean;
 
-import javax.ejb.EJB;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +39,7 @@ public class ActionServlet extends HttpServlet {
 
     public static int PAGE_SIZE = 5;
 
-    @EJB
+    @Autowired
     private MoviesBean moviesBean;
 
     @Override

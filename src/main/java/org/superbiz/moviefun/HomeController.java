@@ -1,6 +1,12 @@
 package org.superbiz.moviefun;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.superbiz.moviefun.albums.Album;
 import org.superbiz.moviefun.albums.AlbumFixtures;
@@ -19,7 +25,12 @@ public class HomeController {
     private final MovieFixtures movieFixtures;
     private final AlbumFixtures albumFixtures;
 
-    public HomeController(MoviesBean moviesBean, AlbumsBean albumsBean, MovieFixtures movieFixtures, AlbumFixtures albumFixtures) {
+    public HomeController(
+            MoviesBean moviesBean,
+            AlbumsBean albumsBean,
+            MovieFixtures movieFixtures,
+            AlbumFixtures albumFixtures
+    ) {
         this.moviesBean = moviesBean;
         this.albumsBean = albumsBean;
         this.movieFixtures = movieFixtures;

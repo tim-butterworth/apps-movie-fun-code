@@ -16,8 +16,12 @@
  */
 package org.superbiz.moviefun.movies;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -29,29 +33,28 @@ import java.util.List;
 @Repository
 public class MoviesBean {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "movies-persistence")
     private EntityManager entityManager;
+
+    @Autowired
+    @Qualifier("movies-transaction-manager") PlatformTransactionManager transactionManager;
 
     public Movie find(Long id) {
         return entityManager.find(Movie.class, id);
     }
 
-    @Transactional
-    public void addMovie(Movie movie) {
-        entityManager.persist(movie);
+    public void addMovie(final Movie movie) {
+        transactional(() -> entityManager.persist(movie));
     }
 
-    @Transactional
     public void editMovie(Movie movie) {
         entityManager.merge(movie);
     }
 
-    @Transactional
     public void deleteMovie(Movie movie) {
-        entityManager.remove(movie);
+        transactional(() -> entityManager.remove(movie));
     }
 
-    @Transactional
     public void deleteMovieId(long id) {
         Movie movie = entityManager.find(Movie.class, id);
         deleteMovie(movie);
@@ -112,6 +115,14 @@ public class MoviesBean {
     }
 
     public void clean() {
-        entityManager.createQuery("delete from Movie").executeUpdate();
+        transactional(() -> entityManager.createQuery("delete from Movie").executeUpdate());
+    }
+
+    private void transactional(Runnable runnable) {
+        TransactionStatus transaction = transactionManager.getTransaction(new DefaultTransactionAttribute());
+
+        runnable.run();
+
+        transactionManager.commit(transaction);
     }
 }
